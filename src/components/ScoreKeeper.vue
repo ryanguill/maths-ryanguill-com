@@ -23,7 +23,6 @@ export default {
     update(state) {
       this.right_count = state.right_count;
       this.wrong_count = state.wrong_count;
-      console.log(state, this.right_count, this.wrong_count);
     }
   },
   created: function() {
@@ -38,12 +37,12 @@ export default {
   background-color: #fff;
   width: 300px;
   margin: 10px auto;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 .score {
   font-weight: bold;
-  font-size: 45pt;
+  font-size: 35pt;
   text-align: center;
   width: 50%;
 }
@@ -51,11 +50,15 @@ export default {
 .right {
   float: left;
   background-color: #9bc53d;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
 .wrong {
   float: right;
   background-color: #c3423f;
   color: #fff;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 </style>

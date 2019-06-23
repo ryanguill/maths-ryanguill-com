@@ -9,6 +9,7 @@
       </div>
       <div class="answer-line">
         <input
+          type="number"
           pattern="[0-9]*"
           novalidate
           value
@@ -96,12 +97,10 @@ export default {
       this.answer = this.firstNumber * this.secondNumber;
     },
     submit() {
-      console.log("submit!");
       if (this.state === "CORRECT") {
         this.next();
         return;
       }
-
       const parsed_submitted_answer = parseInt(this.submitted_answer, 10);
 
       if (this.submitted_answer.trim() === "") {
@@ -166,16 +165,16 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: white;
   width: 300px;
   margin: 0 auto;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 div.question {
   width: 200px;
-  padding: 25px;
+  padding: 15px;
   margin: 0px auto;
   /* border: 1px dashed red; */
   font-weight: bold;
-  font-size: 45pt;
+  font-size: 35pt;
   text-align: right;
 }
 
@@ -189,7 +188,7 @@ div.question {
 
 .answer {
   font-weight: bold;
-  font-size: 45pt;
+  font-size: 35pt;
   width: 195px;
   text-align: right;
 }
@@ -199,7 +198,7 @@ button {
 
 .submit-button {
   font-weight: bold;
-  font-size: 45pt;
+  font-size: 35pt;
   width: 100%;
   text-align: center;
   vertical-align: middle;
