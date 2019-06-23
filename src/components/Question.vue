@@ -9,7 +9,8 @@
       </div>
       <div class="answer-line">
         <input
-          type="number"
+          pattern="[0-9]*"
+          novalidate
           value
           id="submitted_answer"
           ref="submitted_answer"
