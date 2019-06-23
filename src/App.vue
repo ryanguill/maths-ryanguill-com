@@ -1,28 +1,38 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ScoreKeeper/>
+    <Question/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Question from "./components/Question.vue";
+import ScoreKeeper from "./components/ScoreKeeper.vue";
 
 export default {
-  name: 'app',
+  name: "app",
+  propData: {
+    right_count: 0,
+    wrong_count: 0
+  },
   components: {
-    HelloWorld
+    Question,
+    ScoreKeeper
   }
-}
+};
 </script>
 
 <style>
+html,
+body {
+  background-color: #5bc0eb;
+}
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #404e4d;
   margin-top: 60px;
 }
 </style>
