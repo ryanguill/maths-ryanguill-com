@@ -2,22 +2,21 @@
   <div id="app">
     <ScoreKeeper/>
     <Question/>
+    <SettingsButton />
   </div>
 </template>
 
 <script>
 import Question from "./components/Question.vue";
 import ScoreKeeper from "./components/ScoreKeeper.vue";
+import SettingsButton from "./components/SettingsButton";
 
 export default {
   name: "app",
-  propData: {
-    right_count: 0,
-    wrong_count: 0
-  },
   components: {
+    SettingsButton,
     Question,
-    ScoreKeeper
+    ScoreKeeper,
   }
 };
 </script>

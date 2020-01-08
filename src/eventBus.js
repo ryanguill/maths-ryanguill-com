@@ -3,7 +3,7 @@ import Vue from "vue";
 let state = {
   right_count: 0,
   wrong_count: 0,
-	streak: 0,
+  streak: 0
 };
 
 export const EventBus = new Vue({
@@ -14,16 +14,24 @@ export const EventBus = new Vue({
     incorrect() {
       this.$emit("INCORRECT_ANSWER");
     },
+    openSettings() {
+      this.$emit("OPEN_SETTINGS");
+    },
     loadState(newState) {
-      console.log("loadstate", newState); // eslint-disable-line
       state = newState;
       this.stateChange({ persistToLocalStorage: false });
     },
+    resetState() {
+      state = {
+        right_count: 0,
+        wrong_count: 0,
+        streak: 0
+      };
+      this.stateChange({ persistToLocalStorage: true });
+    },
     stateChange({ persistToLocalStorage = true } = {}) {
-      console.log("stateChange", persistToLocalStorage); // eslint-disable-line
       this.$emit("STATE_CHANGE", this.getState());
       if (persistToLocalStorage) {
-        console.log("persisting to local storage", this.getState()); // eslint-disable-line
         localStorage.state = JSON.stringify(this.getState());
       }
     },
@@ -45,5 +53,6 @@ export const EventBus = new Vue({
       state.streak = 0;
       this.stateChange();
     });
+    this.$on("OPEN_SETTINGS", function() {});
   }
 });
