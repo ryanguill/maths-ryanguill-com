@@ -131,7 +131,7 @@ export default {
         } else if (this.firstNumber === 0 || this.secondNumber === 0) {
           this.description = "Remember, anything times 0 equals 0...";
         } else if (this.firstNumber === 2 || this.secondNumber === 2) {
-          this.description = "hint: anything times 2 must be an event number";
+          this.description = "hint: anything times 2 must be an even number";
         } else if (this.firstNumber === 5 || this.secondNumber === 5) {
           this.description = "psst... anything times 5 will end in a 0 or 5";
         } else if (this.firstNumber === 10 || this.secondNumber === 10) {
