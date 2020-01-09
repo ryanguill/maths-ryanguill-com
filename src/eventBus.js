@@ -18,8 +18,17 @@ export const default_state = {
     { id: "nines", number: 9, value: true },
     { id: "tens", number: 10, value: true },
     { id: "elevens", number: 11, value: true },
-    { id: "twelves", number: 12, value: true }
-  ]
+    { id: "twelves", number: 12, value: true },
+    { id: "thirteens", number: 13, value: false },
+    { id: "fourteens", number: 14, value: false },
+    { id: "fifteens", number: 15, value: false },
+    { id: "sixteens", number: 16, value: false },
+    { id: "seventees", number: 17, value: false },
+    { id: "eighteens", number: 18, value: false },
+    { id: "nineteens", number: 19, value: false },
+    { id: "twenties", number: 20, value: false },
+  ],
+  review: {}
 };
 
 let state = _.cloneDeep(default_state);
@@ -34,6 +43,9 @@ export const EventBus = new Vue({
     },
     update_selected_problems(selected_problems) {
       this.$emit("UPDATE_SELECTED_PROBLEMS", selected_problems);
+    },
+    setReview(problem, correct_count) {
+      this.$emit("SET_REVIEW_PROBLEM", problem, correct_count);
     },
     loadState(newState) {
       state = newState;
@@ -55,7 +67,8 @@ export const EventBus = new Vue({
   },
   created() {
     if (localStorage.state) {
-      this.loadState(JSON.parse(localStorage.state));
+      const newState = JSON.parse(localStorage.state);
+      this.loadState({ ...default_state, ...newState });
     }
     this.$on("CORRECT_ANSWER", function() {
       state.right_count += 1;
@@ -71,6 +84,14 @@ export const EventBus = new Vue({
       state.selected_problems = selected_problems;
       this.stateChange();
     });
-
+    this.$on("SET_REVIEW_PROBLEM", function(problem, correct_count) {
+      // if theyve gotten it right 5 times now, remove it from review
+      if (correct_count >= 5) {
+        delete state.review[problem];
+      } else {
+        state.review[problem] = correct_count;
+      }
+      this.stateChange();
+    });
   }
 });
