@@ -1,23 +1,14 @@
 <template>
   <div id="app">
-    <ScoreKeeper/>
-    <Question/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Question from "./components/Question.vue";
-import ScoreKeeper from "./components/ScoreKeeper.vue";
 
 export default {
   name: "app",
-  propData: {
-    right_count: 0,
-    wrong_count: 0
-  },
   components: {
-    Question,
-    ScoreKeeper
   }
 };
 </script>
