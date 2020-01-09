@@ -18,23 +18,25 @@
           v-model="submitted_answer"
           class="answer"
           v-on:keyup.enter="submit"
-        >
+        />
       </div>
       <div class="submit-line" v-show="state !== 'CORRECT'">
         <button class="submit-button" v-on:click="submit">🤔</button>
       </div>
       <div class="messaging" v-show="state !== 'UNANSWERED'">
         <div class="message-card correct" v-show="state === 'CORRECT'">
-          <div class="message">{{message}}</div>
-          <span class="description">{{description}}</span>
+          <div class="message">{{ message }}</div>
+          <span class="description">{{ description }}</span>
         </div>
         <div class="message-card incorrect" v-show="state === 'INCORRECT'">
-          <div class="message">{{message}}</div>
-          <span class="description">{{description}}</span>
+          <div class="message">{{ message }}</div>
+          <span class="description">{{ description }}</span>
         </div>
       </div>
       <div class="next-line" v-show="state === 'CORRECT'">
-        <button class="next-button" ref="next_button" v-on:click="next">next</button>
+        <button class="next-button" ref="next_button" v-on:click="next">
+          next
+        </button>
       </div>
     </div>
   </div>
@@ -42,7 +44,7 @@
 
 <script>
 import _ from "lodash";
-import { EventBus } from "../eventBus";
+import { EventBus, default_state } from "../eventBus";
 
 const correct_messages = [
   "Great Job!",
@@ -83,7 +85,8 @@ export default {
       answer: 0,
       message: "",
       description: "",
-      state: "UNANSWERED"
+      state: "UNANSWERED",
+      selected_problems: _.cloneDeep(default_state.selected_problems)
     };
   },
   methods: {
@@ -92,8 +95,26 @@ export default {
       this.message = "";
       this.description = "";
       this.submitted_answer = "";
-      this.firstNumber = _.random(0, 12);
-      this.secondNumber = _.random(0, 12);
+
+      let selected_problem_numbers = this.selected_problems
+        .filter(p => p.value === true)
+        .map(p => p.number);
+
+      if (selected_problem_numbers.length === 0) {
+        selected_problem_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      }
+
+      const problem_number = _.sample(selected_problem_numbers);
+      const other_number = _.random(0, 12);
+
+      if (_.random(1, 100) > 50) {
+        this.firstNumber = problem_number;
+        this.secondNumber = other_number;
+      } else {
+        this.firstNumber = other_number;
+        this.secondNumber = problem_number;
+      }
+
       this.answer = this.firstNumber * this.secondNumber;
     },
     submit() {
@@ -144,10 +165,15 @@ export default {
     next() {
       this.newQuestion();
       this.$refs.submitted_answer.focus();
+    },
+    on_state_change: function(state) {
+      this.selected_problems = state.selected_problems;
     }
   },
   computed: {},
   created: function() {
+    EventBus.$on("STATE_CHANGE", this.on_state_change);
+    this.on_state_change(EventBus.getState());
     this.newQuestion();
   }
 };

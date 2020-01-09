@@ -1,22 +1,14 @@
 <template>
   <div id="app">
-    <ScoreKeeper/>
-    <Question/>
-    <SettingsButton />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Question from "./components/Question.vue";
-import ScoreKeeper from "./components/ScoreKeeper.vue";
-import SettingsButton from "./components/SettingsButton";
 
 export default {
   name: "app",
   components: {
-    SettingsButton,
-    Question,
-    ScoreKeeper,
   }
 };
 </script>

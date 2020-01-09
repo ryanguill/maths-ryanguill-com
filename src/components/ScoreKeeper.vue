@@ -86,6 +86,8 @@ export default {
   width: 50px;
   font-size: 20pt;
   background-color: gold;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
 }
 
 </style>
