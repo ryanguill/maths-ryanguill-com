@@ -44,7 +44,7 @@
 
 <script>
 import _ from "lodash";
-import { EventBus, default_state } from "../eventBus";
+import { EventBus, default_state, serializeProblem, deserializeProblem } from "../eventBus";
 
 const correct_messages = [
   "Great Job!",
@@ -71,6 +71,25 @@ function random_message(messages_array) {
   return messages_array[rand];
 }
 
+function shouldReview({ questions_to_review = {} }) {
+  if (_.random(1, 100) > 25) {
+    return undefined;
+  }
+  const problems = Object.keys(questions_to_review).map(deserializeProblem);
+  return _.sample(problems);
+}
+
+
+
+function randomizeFactorOrder(a, b) {
+  if (_.random(1, 100) > 50) {
+    return [a, b];
+  } else {
+    return [b, a];
+  }
+}
+
+
 export default {
   name: "Question",
   props: {},
@@ -86,7 +105,8 @@ export default {
       message: "",
       description: "",
       state: "UNANSWERED",
-      selected_problems: _.cloneDeep(default_state.selected_problems)
+      selected_problems: _.cloneDeep(default_state.selected_problems),
+      review: {}
     };
   },
   methods: {
@@ -96,23 +116,28 @@ export default {
       this.description = "";
       this.submitted_answer = "";
 
-      let selected_problem_numbers = this.selected_problems
-        .filter(p => p.value === true)
-        .map(p => p.number);
+      // see if there are any problems we should review:
+      const reviewQuestion = shouldReview({ questions_to_review: this.review });
 
-      if (selected_problem_numbers.length === 0) {
-        selected_problem_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-      }
-
-      const problem_number = _.sample(selected_problem_numbers);
-      const other_number = _.random(0, 12);
-
-      if (_.random(1, 100) > 50) {
-        this.firstNumber = problem_number;
-        this.secondNumber = other_number;
+      if (reviewQuestion !== undefined) {
+        [this.firstNumber, this.secondNumber] = randomizeFactorOrder(
+          ...reviewQuestion
+        );
       } else {
-        this.firstNumber = other_number;
-        this.secondNumber = problem_number;
+        let selected_problem_numbers = this.selected_problems
+          .filter(p => p.value === true)
+          .map(p => p.number);
+
+        if (selected_problem_numbers.length === 0) {
+          selected_problem_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        }
+
+        const problem_number = _.sample(selected_problem_numbers);
+
+        [this.firstNumber, this.secondNumber] = randomizeFactorOrder(
+          problem_number,
+          _.random(0, 12)
+        );
       }
 
       this.answer = this.firstNumber * this.secondNumber;
@@ -126,14 +151,19 @@ export default {
 
       if (this.submitted_answer.trim() === "") {
         //do nothing
-        //this.state = "INCORRECT";
-        //this.message = "";
-        //this.description = ""
         this.$refs.submitted_answer.focus();
       } else if (parsed_submitted_answer === this.answer) {
         if (this.state === "UNANSWERED") {
           EventBus.correct();
         }
+
+        //see if this was a review question, if so, increment the correct counter
+        const problem = serializeProblem(this.firstNumber, this.secondNumber);
+        const reviewQuestion = this.review[problem];
+        if (reviewQuestion !== undefined) {
+          EventBus.setReview(problem, reviewQuestion + 1);
+        }
+
         this.state = "CORRECT";
         this.message = random_message(correct_messages);
         this.description = "";
@@ -145,6 +175,9 @@ export default {
         this.state = "INCORRECT";
         this.message = random_message(incorrect_messages);
         this.description = "";
+
+        // add it to the review stack
+        EventBus.setReview(serializeProblem(this.firstNumber, this.secondNumber), 0);
 
         if (this.firstNumber === 1 || this.secondNumber === 1) {
           this.description =
@@ -168,6 +201,7 @@ export default {
     },
     on_state_change: function(state) {
       this.selected_problems = state.selected_problems;
+      this.review = state.review;
     }
   },
   computed: {},

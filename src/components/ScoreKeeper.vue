@@ -26,7 +26,6 @@ export default {
   },
   methods: {
     update(state) {
-      console.log("update", state); // eslint-disable-line
       this.right_count = state.right_count;
       this.wrong_count = state.wrong_count;
       this.streak = state.streak;

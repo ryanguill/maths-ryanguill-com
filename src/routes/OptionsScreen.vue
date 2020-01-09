@@ -25,18 +25,25 @@
         </div>
       </div>
     </div>
+    <div class="card">
+      <h3>Review Problems:</h3>
+      <div v-for="(reviewProblem, index) in review" :key="index">
+        <div class="review-problem">{{ reviewProblem }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import _ from "lodash";
-import { EventBus, default_state } from "../eventBus";
+import { EventBus, default_state, deserializeProblem } from "../eventBus";
 
 export default {
   name: "OptionsScreen",
   data: function() {
     return {
-      selected_problems: _.cloneDeep(default_state.selected_problems)
+      selected_problems: _.cloneDeep(default_state.selected_problems),
+      review: []
     };
   },
   methods: {
@@ -45,6 +52,10 @@ export default {
     },
     on_state_change: function(state) {
       this.selected_problems = state.selected_problems;
+      this.review = Object.keys(state.review).map(p => {
+        const [a, b] = deserializeProblem(p);
+        return `${a} x ${b}`;
+      });
     },
     reset_progress: function() {
       if (confirm("Are you sure? You will lose all of your progress!")) {
@@ -63,8 +74,10 @@ export default {
 .card {
   background-color: white;
   width: 300px;
-  margin: 0 auto;
+  margin: 10px auto;
   border-radius: 10px;
+  padding-top: 15px;
+  padding-bottom: 25px;
 }
 
 .button {
@@ -92,5 +105,9 @@ export default {
 
 .problem-option input[type="checkbox"] {
   transform: scale(2, 2);
+}
+
+.review-problem {
+  font-size: x-large;
 }
 </style>
