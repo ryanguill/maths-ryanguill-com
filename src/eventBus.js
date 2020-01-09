@@ -33,6 +33,14 @@ export const default_state = {
 
 let state = _.cloneDeep(default_state);
 
+export function serializeProblem (a, b) {
+  return [a, b].sort().join(':');
+}
+
+export function deserializeProblem (problem) {
+  return problem.split(':');
+}
+
 export const EventBus = new Vue({
   methods: {
     correct() {

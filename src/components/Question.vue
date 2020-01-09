@@ -44,7 +44,7 @@
 
 <script>
 import _ from "lodash";
-import { EventBus, default_state } from "../eventBus";
+import { EventBus, default_state, serializeProblem, deserializeProblem } from "../eventBus";
 
 const correct_messages = [
   "Great Job!",
@@ -79,13 +79,7 @@ function shouldReview({ questions_to_review = {} }) {
   return _.sample(problems);
 }
 
-function serializeProblem (a, b) {
-  return [a, b].sort().join(':');
-}
 
-function deserializeProblem (problem) {
-  return problem.split(':');
-}
 
 function randomizeFactorOrder(a, b) {
   if (_.random(1, 100) > 50) {
