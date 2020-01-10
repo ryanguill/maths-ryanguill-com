@@ -44,51 +44,16 @@
 
 <script>
 import _ from "lodash";
-import { EventBus, default_state, serializeProblem, deserializeProblem } from "../eventBus";
-
-const correct_messages = [
-  "Great Job!",
-  "Excellent!",
-  "Keep it up!",
-  "Way to go!",
-  "Great Work!",
-  "🤓 Super!",
-  "Wow!",
-  "🤩 Amazing!",
-  "😍 Nice!"
-];
-
-const incorrect_messages = [
-  "Sorry, try again",
-  "hmm, not quite",
-  "😬 no...",
-  "😖",
-  "😱"
-];
-
-function random_message(messages_array) {
-  const rand = _.random(0, messages_array.length - 1);
-  return messages_array[rand];
-}
-
-function shouldReview({ questions_to_review = {} }) {
-  if (_.random(1, 100) > 25) {
-    return undefined;
-  }
-  const problems = Object.keys(questions_to_review).map(deserializeProblem);
-  return _.sample(problems);
-}
-
-
-
-function randomizeFactorOrder(a, b) {
-  if (_.random(1, 100) > 50) {
-    return [a, b];
-  } else {
-    return [b, a];
-  }
-}
-
+import { EventBus } from "../eventBus";
+import {
+  default_state,
+  serializeProblem,
+  shouldReview,
+  randomizeFactorOrder,
+  correct_messages,
+  incorrect_messages,
+  random_message
+} from "../utils";
 
 export default {
   name: "Question",
@@ -177,7 +142,10 @@ export default {
         this.description = "";
 
         // add it to the review stack
-        EventBus.setReview(serializeProblem(this.firstNumber, this.secondNumber), 0);
+        EventBus.setReview(
+          serializeProblem(this.firstNumber, this.secondNumber),
+          0
+        );
 
         if (this.firstNumber === 1 || this.secondNumber === 1) {
           this.description =
