@@ -36,7 +36,8 @@
 
 <script>
 import _ from "lodash";
-import { EventBus, default_state, deserializeProblem } from "../eventBus";
+import { EventBus } from "../eventBus";
+import { default_state, deserializeProblem } from "../utils";
 
 export default {
   name: "OptionsScreen",
