@@ -108,7 +108,7 @@ export function nextQuestion({
 
     if (
       reviewQuestion !== undefined &&
-      !isProblemInHistory({ history, problem: reviewQuestion })
+      !isProblemInHistory({ history, problem: serializeProblem(...reviewQuestion) })
     ) {
       [firstNumber, secondNumber] = randomizeFactorOrder(...reviewQuestion);
       foundProblem = true;
