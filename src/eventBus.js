@@ -13,11 +13,17 @@ export const EventBus = new Vue({
     incorrect() {
       this.$emit("INCORRECT_ANSWER");
     },
+    setLastAnswer(problem) {
+      this.$emit("SET_LAST_ANSWER", problem);
+    },
     update_selected_problems(selected_problems) {
       this.$emit("UPDATE_SELECTED_PROBLEMS", selected_problems);
     },
     setReview(problem, correct_count) {
       this.$emit("SET_REVIEW_PROBLEM", problem, correct_count);
+    },
+    addToHistory(problem) {
+			this.$emit("ADD_TO_HISTORY", problem);
     },
     loadState(newState) {
       state = newState;
@@ -47,6 +53,10 @@ export const EventBus = new Vue({
       state.streak += 1;
       this.stateChange();
     });
+    this.$on("SET_LAST_ANSWER", function(problem) {
+      state.lastAnswer = problem;
+      this.stateChange();
+    });
     this.$on("INCORRECT_ANSWER", function() {
       state.wrong_count += 1;
       state.streak = 0;
@@ -54,6 +64,13 @@ export const EventBus = new Vue({
     });
     this.$on("UPDATE_SELECTED_PROBLEMS", function(selected_problems) {
       state.selected_problems = selected_problems;
+      this.stateChange();
+    });
+    this.$on("ADD_TO_HISTORY", function(problem) {
+      state.history.push(problem);
+      if (state.history.length > 5) {
+				state.history.shift();
+      }
       this.stateChange();
     });
     this.$on("SET_REVIEW_PROBLEM", function(problem, correct_count) {

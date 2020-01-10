@@ -25,19 +25,20 @@ export const default_state = {
     { id: "seventees", number: 17, value: false },
     { id: "eighteens", number: 18, value: false },
     { id: "nineteens", number: 19, value: false },
-    { id: "twenties", number: 20, value: false },
+    { id: "twenties", number: 20, value: false }
   ],
-  review: {}
+  review: {},
+  history: [],
+  lastAnswer: null
 };
 
-export function serializeProblem (a, b) {
-  return [a, b].sort().join(':');
+export function serializeProblem(a, b) {
+  return [a, b].sort().join(":");
 }
 
-export function deserializeProblem (problem) {
-  return problem.split(':');
+export function deserializeProblem(problem) {
+  return problem.split(":");
 }
-
 
 export function shouldReview({ questions_to_review = {} }) {
   if (_.random(1, 100) > 25) {
@@ -54,7 +55,6 @@ export function randomizeFactorOrder(a, b) {
     return [b, a];
   }
 }
-
 
 export const correct_messages = [
   "Great Job!",
@@ -79,4 +79,71 @@ export const incorrect_messages = [
 export function random_message(messages_array) {
   const rand = _.random(0, messages_array.length - 1);
   return messages_array[rand];
+}
+
+function isProblemInHistory({ history, problem }) {
+  return history.includes(problem);
+}
+
+export function nextQuestion({
+  questions_to_review,
+  selected_problems,
+  history,
+  lastAnswer
+}) {
+  let firstNumber = 0;
+  let secondNumber = 0;
+  let foundProblem = false;
+
+  if (history.length && lastAnswer !== history[history.length - 1]) {
+    [firstNumber, secondNumber] = randomizeFactorOrder(
+      ...deserializeProblem(history[history.length - 1])
+    );
+    foundProblem = true;
+  }
+
+  if (!foundProblem) {
+    // see if there are any problems we should review:
+    const reviewQuestion = shouldReview({ questions_to_review });
+
+    if (
+      reviewQuestion !== undefined &&
+      !isProblemInHistory({ history, problem: reviewQuestion })
+    ) {
+      [firstNumber, secondNumber] = randomizeFactorOrder(...reviewQuestion);
+      foundProblem = true;
+    }
+  }
+
+  while (!foundProblem) {
+    let selected_problem_numbers = selected_problems
+      .filter(p => p.value === true)
+      .map(p => p.number);
+
+    if (selected_problem_numbers.length === 0) {
+      selected_problem_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    }
+
+    const problem_number = _.sample(selected_problem_numbers);
+
+    [firstNumber, secondNumber] = randomizeFactorOrder(
+      problem_number,
+      _.random(0, 12)
+    );
+
+    if (
+      !isProblemInHistory({
+        history,
+        problem: serializeProblem(firstNumber, secondNumber)
+      })
+    ) {
+      foundProblem = true;
+    }
+  }
+
+  return {
+    firstNumber,
+    secondNumber,
+    answer: firstNumber * secondNumber
+  };
 }

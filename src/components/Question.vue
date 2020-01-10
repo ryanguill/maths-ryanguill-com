@@ -48,11 +48,10 @@ import { EventBus } from "../eventBus";
 import {
   default_state,
   serializeProblem,
-  shouldReview,
-  randomizeFactorOrder,
   correct_messages,
   incorrect_messages,
-  random_message
+  random_message,
+  nextQuestion
 } from "../utils";
 
 export default {
@@ -71,7 +70,9 @@ export default {
       description: "",
       state: "UNANSWERED",
       selected_problems: _.cloneDeep(default_state.selected_problems),
-      review: {}
+      review: {},
+      history: [],
+      lastAnswer: null
     };
   },
   methods: {
@@ -81,31 +82,18 @@ export default {
       this.description = "";
       this.submitted_answer = "";
 
-      // see if there are any problems we should review:
-      const reviewQuestion = shouldReview({ questions_to_review: this.review });
+      const nextQuestionResult = nextQuestion({
+        questions_to_review: this.review,
+        selected_problems: this.selected_problems,
+        history: this.history,
+        lastAnswer: this.lastAnswer
+      });
 
-      if (reviewQuestion !== undefined) {
-        [this.firstNumber, this.secondNumber] = randomizeFactorOrder(
-          ...reviewQuestion
-        );
-      } else {
-        let selected_problem_numbers = this.selected_problems
-          .filter(p => p.value === true)
-          .map(p => p.number);
+      this.firstNumber = nextQuestionResult.firstNumber;
+      this.secondNumber = nextQuestionResult.secondNumber;
+      this.answer = nextQuestionResult.answer;
 
-        if (selected_problem_numbers.length === 0) {
-          selected_problem_numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        }
-
-        const problem_number = _.sample(selected_problem_numbers);
-
-        [this.firstNumber, this.secondNumber] = randomizeFactorOrder(
-          problem_number,
-          _.random(0, 12)
-        );
-      }
-
-      this.answer = this.firstNumber * this.secondNumber;
+      EventBus.addToHistory(serializeProblem(this.firstNumber, this.secondNumber));
     },
     submit() {
       if (this.state === "CORRECT") {
@@ -113,6 +101,7 @@ export default {
         return;
       }
       const parsed_submitted_answer = parseInt(this.submitted_answer, 10);
+      const problem = serializeProblem(this.firstNumber, this.secondNumber);
 
       if (this.submitted_answer.trim() === "") {
         //do nothing
@@ -122,8 +111,9 @@ export default {
           EventBus.correct();
         }
 
+        EventBus.setLastAnswer(problem);
+
         //see if this was a review question, if so, increment the correct counter
-        const problem = serializeProblem(this.firstNumber, this.secondNumber);
         const reviewQuestion = this.review[problem];
         if (reviewQuestion !== undefined) {
           EventBus.setReview(problem, reviewQuestion + 1);
@@ -142,8 +132,7 @@ export default {
         this.description = "";
 
         // add it to the review stack
-        EventBus.setReview(
-          serializeProblem(this.firstNumber, this.secondNumber),
+        EventBus.setReview(problem,
           0
         );
 
@@ -170,6 +159,8 @@ export default {
     on_state_change: function(state) {
       this.selected_problems = state.selected_problems;
       this.review = state.review;
+      this.history = state.history;
+      this.lastAnswer = state.lastAnswer;
     }
   },
   computed: {},
