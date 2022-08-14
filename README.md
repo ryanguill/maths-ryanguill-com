@@ -1,5 +1,11 @@
 # maths-ryanguill-com
 
+A small vue project to help my kids practice maths.
+
+hosted with netlify.
+
+https://maths.ryanguill.com/#/
+
 ## Project setup
 ```
 npm install

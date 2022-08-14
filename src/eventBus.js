@@ -16,6 +16,9 @@ export const EventBus = new Vue({
     setLastAnswer(problem) {
       this.$emit("SET_LAST_ANSWER", problem);
     },
+    update_selected_operators(selected_operators) {
+      this.$emit("UPDATE_SELECTED_OPERATORS", selected_operators);
+    },
     update_selected_problems(selected_problems) {
       this.$emit("UPDATE_SELECTED_PROBLEMS", selected_problems);
     },
@@ -60,6 +63,10 @@ export const EventBus = new Vue({
     this.$on("INCORRECT_ANSWER", function() {
       state.wrong_count += 1;
       state.streak = 0;
+      this.stateChange();
+    });
+    this.$on("UPDATE_SELECTED_OPERATORS", function(selected_operators) {
+      state.selected_operators = selected_operators;
       this.stateChange();
     });
     this.$on("UPDATE_SELECTED_PROBLEMS", function(selected_problems) {

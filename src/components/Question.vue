@@ -4,7 +4,7 @@
       <div class="number" id="number-1">{{ firstNumber }}</div>
 
       <div class="operator-line">
-        <span class="operator">x</span>
+        <span class="operator">{{ selected_operation }}</span>
         <span class="number" id="number-2">{{ secondNumber }}</span>
       </div>
       <div class="answer-line">
@@ -70,6 +70,8 @@ export default {
       description: "",
       state: "UNANSWERED",
       selected_problems: _.cloneDeep(default_state.selected_problems),
+      selected_operators: _.cloneDeep(default_state.selected_operators),
+      selected_operation: "*",
       review: {},
       history: [],
       lastAnswer: null
@@ -85,12 +87,14 @@ export default {
       const nextQuestionResult = nextQuestion({
         questions_to_review: this.review,
         selected_problems: this.selected_problems,
+        selected_operators: this.selected_operators,
         history: this.history,
         lastAnswer: this.lastAnswer
       });
 
       this.firstNumber = nextQuestionResult.firstNumber;
       this.secondNumber = nextQuestionResult.secondNumber;
+      this.selected_operation = nextQuestionResult.selected_operation;
       this.answer = nextQuestionResult.answer;
 
       EventBus.addToHistory(serializeProblem(this.firstNumber, this.secondNumber));
@@ -101,7 +105,7 @@ export default {
         return;
       }
       const parsed_submitted_answer = parseInt(this.submitted_answer, 10);
-      const problem = serializeProblem(this.firstNumber, this.secondNumber);
+      const problem = serializeProblem(this.firstNumber, this.secondNumber, this.selected_operation.label);
 
       if (this.submitted_answer.trim() === "") {
         //do nothing
@@ -158,6 +162,7 @@ export default {
     },
     on_state_change: function(state) {
       this.selected_problems = state.selected_problems;
+      this.selected_operators = state.selected_operators;
       this.review = state.review;
       this.history = state.history;
       this.lastAnswer = state.lastAnswer;

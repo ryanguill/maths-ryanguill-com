@@ -11,6 +11,21 @@
       </button>
     </div>
     <div class="card">
+      <h3>Choose which operators you want to work on:</h3>
+      <div v-for="operator in selected_operators" v-bind:key="operator.id">
+        <div class="operator-option">
+          <label>
+            <input
+              type="checkbox"
+              v-on:change="change"
+              v-model="operator.value"
+            />
+            {{ operator.id }}
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
       <h3>Choose which problems you want to work on:</h3>
       <div v-for="problem in selected_problems" v-bind:key="problem.id">
         <div class="problem-option">
@@ -44,18 +59,20 @@ export default {
   data: function() {
     return {
       selected_problems: _.cloneDeep(default_state.selected_problems),
+      selected_operators: _.cloneDeep(default_state.selected_operators),
       review: []
     };
   },
   methods: {
     change: function() {
+      EventBus.update_selected_operators(this.selected_operators),
       EventBus.update_selected_problems(this.selected_problems);
     },
     on_state_change: function(state) {
       this.selected_problems = state.selected_problems;
       this.review = Object.keys(state.review).map(p => {
-        const [a, b] = deserializeProblem(p);
-        return `${a} x ${b}`;
+        const [a, b, operator] = deserializeProblem(p);
+        return `${a} ${operator} ${b}`;
       });
     },
     reset_progress: function() {
